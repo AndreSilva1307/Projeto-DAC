@@ -1,0 +1,25 @@
+.card {
+    background: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+    font-weight: 600;
+  }
+  
+  .user-info-card p {
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+  }
+  
+  .user-info-card p strong {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-right: 0.5rem;
+  }

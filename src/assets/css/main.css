@@ -1,0 +1,9 @@
+@import './base/reset.css'; /* Reset CSS para padronização entre navegadores */
+@import './base/variables.css'; /* Variáveis CSS globais (cores, tamanhos, etc.) */
+
+@import './components/buttons.css'; /* Estilos para botões */
+@import './components/forms.css'; /* Estilos para formulários e campos de entrada */
+@import './components/cards.css'; /* Estilos para cards e containers */
+
+@import './layouts/auth.css'; /* Estilos para páginas de autenticação (login/cadastro) */
+@import '../layouts/dashboard.css'; /* Estilos para o dashboard (área logada) */

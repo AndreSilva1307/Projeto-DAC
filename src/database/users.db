@@ -1,0 +1,2 @@
+{"email":"admin@admin.com","password":"$2a$10$PbXnsSPzhGEb0lGSpvldUeNdQ3rRDCPkdWUH/KiOgh.5eVXiiONjq","userType":"doctor","createdAt":{"$$date":1743182532944},"_id":"IPFYpJHNOQ2YWrVj"}
+{"$$indexCreated":{"fieldName":"email","unique":true,"sparse":false}}
