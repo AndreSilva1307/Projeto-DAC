@@ -13,3 +13,5 @@ clinica-electron/
 
 
 Sempre que editar o programa fazer o versionamento no package.json
+
+utilize npm install para instalar as dependencias e npm start para rodar o programa
