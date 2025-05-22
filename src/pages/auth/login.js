@@ -1,41 +1,89 @@
-// Aguarda o carregamento completo do DOM antes de executar o código
 document.addEventListener('DOMContentLoaded', () => {
-  // Obtém referências aos elementos do formulário
-  const loginForm = document.getElementById('loginForm')
-  const registerLink = document.getElementById('registerLink')
+  // Verifica se é um carregamento fresco
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('fresh')) {
+    // Limpa o formulário
+    document.getElementById('loginForm').reset();
+    
+    // Remove o parâmetro da URL sem recarregar
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
 
-  // Adiciona listener para o evento de submit do formulário
+  // Elementos do DOM
+  const loginForm = document.getElementById('loginForm');
+  const registerLink = document.getElementById('registerLink');
+  const errorMessage = document.createElement('div');
+  errorMessage.className = 'error-message';
+  loginForm.insertBefore(errorMessage, loginForm.firstChild);
+
+  // Configuração inicial
+  errorMessage.style.display = 'none';
+
+  // Validação do formulário
+  const validateForm = () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const userType = document.getElementById('userType').value;
+
+    if (!email || !password || !userType) {
+      showError('Todos os campos são obrigatórios');
+      return false;
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      showError('Email inválido');
+      return false;
+    }
+
+    return true;
+  };
+
+  // Exibe mensagens de erro
+  const showError = (message) => {
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+    setTimeout(() => {
+      errorMessage.style.display = 'none';
+    }, 5000);
+  };
+
+  // Manipulador de submit
   loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault() // Impede o comportamento padrão de submit
+    e.preventDefault();
     
-    // Obtém os valores dos campos do formulário
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
-    const userType = document.getElementById('userType').value
-    
+    if (!validateForm()) return;
+
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Autenticando...';
+
     try {
-      // Chama a API do Electron para fazer login
-      const result = await window.electronAPI.login({ email, password, userType })
+      const credentials = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        userType: document.getElementById('userType').value
+      };
+
+      const result = await window.electronAPI.login(credentials);
       
-      // Verifica se o login foi bem-sucedido
       if (result.success) {
-        // Navega para o dashboard correspondente ao tipo de usuário
-        window.electronAPI.navigateTo(`dashboard/${userType}/dashboard`)
+        window.electronAPI.navigateTo(`dashboard/${credentials.userType}/dashboard`);
       } else {
-        // Exibe mensagem de erro retornada pela API ou uma mensagem padrão
-        alert(result.message || 'Erro no login')
+        showError(result.message || 'Credenciais inválidas');
       }
     } catch (error) {
-      // Loga o erro no console e exibe mensagem genérica
-      console.error('Login error:', error)
-      alert('Erro ao fazer login')
+      console.error('Erro no login:', error);
+      showError('Erro na conexão com o servidor');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
     }
-  })
+  });
 
-  // Adiciona listener para o link de registro
+  // Navegação para registro
   registerLink.addEventListener('click', (e) => {
-    e.preventDefault() // Impede o comportamento padrão do link
-    // Navega para a página de registro
-    window.electronAPI.navigateTo('auth/register')
-  })
-})
+    e.preventDefault();
+    window.electronAPI.navigateTo('auth/register');
+  });
+});

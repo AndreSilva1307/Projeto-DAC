@@ -182,3 +182,20 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) createWindow()
 })
+
+// Adicione este handler no seu main.js existente
+ipcMain.on('navigate-to', (_, page) => {
+  // Extrai path e query parameters
+  const [path, query] = page.split('?');
+  
+  // Verifica se deve forçar recarregamento
+  const forceReload = query && query.includes('fresh=true');
+  
+  // Carrega a página
+  mainWindow.loadFile(`src/pages/${path}.html`).then(() => {
+    if (forceReload) {
+      // Força recarregamento limpo
+      mainWindow.webContents.reloadIgnoringCache();
+    }
+  });
+});

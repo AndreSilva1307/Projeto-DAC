@@ -3,22 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard do Médico</title>
+  <title>Dashboard do Médico - ByteBlass</title>
   <link rel="stylesheet" href="../../../assets/css/main.css">
 </head>
 <body>
   <header class="dashboard-header">
-    <h1>Bem-vindo, Dr. <span id="userName"></span>!</h1>
+    <div class="header-content">
+      <h1>Bem-vindo, Dr. <span id="userName"></span></h1>
+      <p id="doctorSpecialty"></p>
+    </div>
     <button id="logoutBtn" class="btn logout-btn">Sair</button>
   </header>
   
-  <main class="dashboard-content">
-    <div class="card user-info-card">
-      <h2 class="card-title">Suas Informações</h2>
-      <div id="userInfo"></div>
-    </div>
+  <main class="dashboard-container">
+    <section class="doctor-info-section">
+      <div class="card">
+        <h2><i class="icon-user"></i> Informações Pessoais</h2>
+        <div id="doctorInfo" class="info-grid"></div>
+      </div>
+    </section>
+
+    <section class="patients-section">
+      <div class="card">
+        <div class="section-header">
+          <h2><i class="icon-patients"></i> Seus Pacientes</h2>
+          <button id="refreshPatientsBtn" class="btn small-btn">Atualizar</button>
+        </div>
+        <div id="patientsList" class="patients-list"></div>
+      </div>
+    </section>
   </main>
-  
+
   <script src="dashboard.js"></script>
+</body>
+</html>
 </body>
 </html>

@@ -1,24 +1,35 @@
-<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard do Paciente</title>
-  <link rel="stylesheet" href="../../../assets/css/main.css">
+  <title>Dashboard do Paciente - ByteBlass</title>
+  <link rel="stylesheet" href="../../../assets/css/">
 </head>
 <body>
   <header class="dashboard-header">
-    <h1>Bem-vindo, <span id="userName"></span>!</h1>
+    <h1>Bem-vindo, <span id="userName"></span></h1>
     <button id="logoutBtn" class="btn logout-btn">Sair</button>
   </header>
   
-  <main class="dashboard-content">
-    <div class="card user-info-card">
-      <h2 class="card-title">Suas Informações</h2>
-      <div id="userInfo"></div>
-    </div>
+  <main class="dashboard-container">
+    <section class="patient-info-section">
+      <div class="card">
+        <h2><i class="icon-info"></i> Suas Informações</h2>
+        <div id="patientInfo" class="info-grid"></div>
+      </div>
+    </section>
+
+    <section class="appointments-section">
+      <div class="card">
+        <div class="section-header">
+          <h2><i class="icon-calendar"></i> Próximas Consultas</h2>
+          <button id="refreshAppointmentsBtn" class="btn small-btn">Atualizar</button>
+        </div>
+        <div id="appointmentsList" class="appointments-list"></div>
+      </div>
+    </section>
   </main>
-  
+
   <script src="dashboard.js"></script>
 </body>
 </html>

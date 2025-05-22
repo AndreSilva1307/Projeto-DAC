@@ -1,79 +1,123 @@
-// Executa quando o conteúdo da página é carregado
 document.addEventListener('DOMContentLoaded', () => {
-  // Obtém elementos do DOM
-  const userTypeSelect = document.getElementById('userType') // Selector de tipo de usuário
-  const registerForm = document.getElementById('registerForm') // Formulário de registro
-  const loginLink = document.getElementById('loginLink') // Link para login
+  // Elementos do DOM
+  const userTypeSelect = document.getElementById('userType');
+  const registerForm = document.getElementById('registerForm');
+  const loginLink = document.getElementById('loginLink');
+  const errorMessage = document.createElement('div');
+  errorMessage.className = 'error-message';
+  registerForm.insertBefore(errorMessage, registerForm.firstChild);
 
-  // Controla a exibição dos campos específicos por tipo de usuário
+  // Estado inicial
+  errorMessage.style.display = 'none';
+
+  // Alterna campos específicos
   userTypeSelect.addEventListener('change', (e) => {
-      // Esconde todos os campos específicos
-      document.querySelectorAll('.user-type-fields').forEach(el => {
-          el.style.display = 'none'
-      })
-      
-      // Mostra campos conforme tipo selecionado
-      if (e.target.value === 'patient') {
-          document.getElementById('patientFields').style.display = 'block'
-      } else if (e.target.value === 'doctor') {
-          document.getElementById('doctorFields').style.display = 'block'
-      }
-  })
+    document.querySelectorAll('.user-type-fields').forEach(el => {
+      el.style.display = 'none';
+    });
 
-  // Manipula o envio do formulário de registro
+    if (e.target.value === 'patient') {
+      document.getElementById('patientFields').style.display = 'block';
+    } else if (e.target.value === 'doctor') {
+      document.getElementById('doctorFields').style.display = 'block';
+    }
+  });
+
+  // Validação do formulário
+  const validateForm = () => {
+    const userType = document.getElementById('userType').value;
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (!userType || !name || !email || !password || !confirmPassword) {
+      showError('Todos os campos básicos são obrigatórios');
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      showError('As senhas não coincidem');
+      return false;
+    }
+
+    if (password.length < 6) {
+      showError('A senha deve ter pelo menos 6 caracteres');
+      return false;
+    }
+
+    if (userType === 'doctor' && !document.getElementById('crm').value) {
+      showError('CRM é obrigatório para médicos');
+      return false;
+    }
+
+    return true;
+  };
+
+  // Exibe mensagens de erro
+  const showError = (message) => {
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+    setTimeout(() => {
+      errorMessage.style.display = 'none';
+    }, 5000);
+  };
+
+  // Manipulador de submit
   registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault() // Impede envio padrão do formulário
-      
-      // Obtém valores dos campos
-      const userType = document.getElementById('userType').value
-      const name = document.getElementById('name').value
-      const email = document.getElementById('email').value
-      const password = document.getElementById('password').value
-      const confirmPassword = document.getElementById('confirmPassword').value
-      
-      // Valida se senhas coincidem
-      if (password !== confirmPassword) {
-          alert('As senhas não coincidem')
-          return
-      }
-      
-      // Prepara objeto com dados básicos
-      let userData = {
-          userType,
-          name,
-          email,
-          password
-      }
-      
-      // Adiciona campos específicos conforme tipo de usuário
-      if (userType === 'patient') {
-          userData.birthDate = document.getElementById('birthDate').value
-          userData.healthPlan = document.getElementById('healthPlan').value
-      } else if (userType === 'doctor') {
-          userData.crm = document.getElementById('crm').value
-          userData.specialty = document.getElementById('specialty').value
-      }
-      
-      try {
-          // Envia dados para registro via API Electron
-          const result = await window.electronAPI.register(userData)
-          
-          // Trata resultado do registro
-          if (result.success) {
-              alert('Registro realizado com sucesso!')
-              window.electronAPI.navigateTo('auth/login') // Redireciona para login
-          } else {
-              alert(result.message || 'Erro no registro') // Mostra erro
-          }
-      } catch (error) {
-          console.error('Registration error:', error) // Log de erro
-          alert('Erro ao registrar') // Feedback ao usuário
-      }
-  })
+    e.preventDefault();
+    
+    if (!validateForm()) return;
 
-  // Redireciona para página de login
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Registrando...';
+
+    try {
+      const userType = document.getElementById('userType').value;
+      const userData = {
+        userType,
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      };
+
+      // Campos específicos
+      if (userType === 'patient') {
+        userData.birthDate = document.getElementById('birthDate').value;
+        userData.healthPlan = document.getElementById('healthPlan').value;
+      } else {
+        userData.crm = document.getElementById('crm').value;
+        userData.specialty = document.getElementById('specialty').value;
+      }
+
+      const result = await window.electronAPI.register(userData);
+      
+      if (result.success) {
+        // Reset completo antes de navegar
+        registerForm.reset();
+        document.querySelectorAll('.user-type-fields').forEach(el => {
+          el.style.display = 'none';
+        });
+        
+        // Navega com parâmetro fresh
+        window.electronAPI.navigateTo('auth/login?fresh=true');
+      } else {
+        showError(result.message || 'Erro no registro');
+      }
+    } catch (error) {
+      console.error('Erro no registro:', error);
+      showError('Erro ao conectar com o servidor');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    }
+  });
+
+  // Navegação para login
   loginLink.addEventListener('click', (e) => {
-      e.preventDefault()
-      window.electronAPI.navigateTo('auth/login')
-  })
-})
+    e.preventDefault();
+    window.electronAPI.navigateTo('auth/login');
+  });
+});
